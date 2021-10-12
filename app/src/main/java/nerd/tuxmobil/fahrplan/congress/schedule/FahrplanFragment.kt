@@ -53,6 +53,7 @@ import nerd.tuxmobil.fahrplan.congress.extensions.requireViewByIdCompat
 import nerd.tuxmobil.fahrplan.congress.models.DateInfos
 import nerd.tuxmobil.fahrplan.congress.models.ScheduleData
 import nerd.tuxmobil.fahrplan.congress.models.Session
+import nerd.tuxmobil.fahrplan.congress.net.ConnectivityObserver
 import nerd.tuxmobil.fahrplan.congress.net.ErrorMessage
 import nerd.tuxmobil.fahrplan.congress.repositories.AppRepository
 import nerd.tuxmobil.fahrplan.congress.sharing.SessionSharer
@@ -94,6 +95,7 @@ class FahrplanFragment : Fragment(), SessionViewEventsHandler {
     private lateinit var inflater: LayoutInflater
     private lateinit var sessionViewDrawer: SessionViewDrawer
     private lateinit var errorMessageFactory: ErrorMessage.Factory
+    private lateinit var connectivityObserver: ConnectivityObserver
     private lateinit var roomTitleTypeFace: Typeface
     private lateinit var contextMenuView: View
     private lateinit var viewModel: FahrplanViewModel
@@ -128,6 +130,11 @@ class FahrplanFragment : Fragment(), SessionViewEventsHandler {
         roomTitleTypeFace = TypefaceFactory.getNewInstance(context).getTypeface(Font.Roboto.Light)
         sessionViewDrawer = SessionViewDrawer(context, { sessionPadding })
         errorMessageFactory = ErrorMessage.Factory(context)
+        connectivityObserver = ConnectivityObserver(context, onConnectionAvailable = {
+            Log.d(LOG_TAG, "Network is available.")
+            viewModel.requestScheduleAutoUpdate()
+        })
+        connectivityObserver.start()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -201,6 +208,11 @@ class FahrplanFragment : Fragment(), SessionViewEventsHandler {
             intent.removeExtra(BUNDLE_KEY_SESSION_ALARM_SESSION_ID) // jump to given sessionId only once
         }
         Logging.get().d(LOG_TAG, "onResume")
+    }
+
+    override fun onDestroy() {
+        connectivityObserver.stop()
+        super.onDestroy()
     }
 
     /**
