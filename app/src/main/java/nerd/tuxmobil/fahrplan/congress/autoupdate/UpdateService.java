@@ -12,6 +12,7 @@ import androidx.core.app.SafeJobIntentService;
 
 import java.util.List;
 
+import info.metadude.android.eventfahrplan.commons.logging.Logging;
 import kotlin.Unit;
 import nerd.tuxmobil.fahrplan.congress.MyApp;
 import nerd.tuxmobil.fahrplan.congress.MyApp.TASKS;
@@ -89,6 +90,7 @@ public class UpdateService extends SafeJobIntentService {
     }
 
     private void fetchFahrplan() {
+        Logging.get().d(LOG_TAG, "fetchFahrplan");
         if (MyApp.task_running == TASKS.NONE) {
             MyApp.task_running = TASKS.FETCH;
             String url = appRepository.readScheduleUrl();

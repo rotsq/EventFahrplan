@@ -506,6 +506,7 @@ class FahrplanFragment : Fragment(), SessionViewEventsHandler {
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         return if (menuItem.itemId == R.id.menu_item_refresh) {
+            Log.e(LOG_TAG, "Refresh menu item clicked.")
             viewModel.requestScheduleUpdate(isUserRequest = true)
             true
         } else {
@@ -553,6 +554,7 @@ class FahrplanFragment : Fragment(), SessionViewEventsHandler {
                 return true
             }
             if (itemPosition < numDays) {
+                Log.e(LOG_TAG, "Day menu item (index=$itemPosition) clicked.");
                 viewModel.selectDay(itemPosition)
                 return true
             }

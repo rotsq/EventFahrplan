@@ -63,6 +63,7 @@ internal class FahrplanViewModel(
     private fun updateUncanceledSessions() {
         launch {
             repository.uncanceledSessionsForDayIndex.collect { scheduleData ->
+                logging.e(LOG_TAG, "updateUncanceledSessions -> Collecting sessions ...")
                 val sessions = scheduleData.allSessions
                 if (sessions.isEmpty()) {
                     val scheduleVersion = repository.readMeta().version
@@ -205,6 +206,7 @@ internal class FahrplanViewModel(
 
     fun scrollToCurrent() {
         launch {
+            logging.e(LOG_TAG, "scrollToCurrent -> Collecting sessions ...")
             val scheduleData = repository.loadUncanceledSessionsForDayIndex()
             val sessions = scheduleData.allSessions
             if (sessions.isNotEmpty()) {
@@ -220,6 +222,7 @@ internal class FahrplanViewModel(
     fun scrollToSession(sessionId: String, boxHeight: Int) {
         launch {
             val scheduleData = repository.loadUncanceledSessionsForDayIndex()
+            logging.e(LOG_TAG, "scrollToSession -> Collecting sessions ...")
             val sessions = scheduleData.allSessions
             if (sessions.isNotEmpty()) {
                 val session = scheduleData.findSession(sessionId)

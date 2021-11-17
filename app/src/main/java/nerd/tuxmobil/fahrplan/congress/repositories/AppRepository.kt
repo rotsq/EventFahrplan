@@ -169,7 +169,11 @@ object AppRepository {
     val uncanceledSessionsForDayIndex: Flow<ScheduleData> by lazy {
         refreshUncanceledSessionsSignal
             .onStart { emit(Unit) }
-            .mapLatest { loadUncanceledSessionsForDayIndex() }
+            .mapLatest {
+                loadUncanceledSessionsForDayIndex().also {
+                    logging.d(javaClass.simpleName, "Emitting at uncanceledSessionsForDayIndex with dayIndex = ${it.dayIndex}")
+                }
+            }
             .distinctUntilChanged() // If server does not respond with HTTP 304 (Not modified).
             .flowOn(executionContext.database)
     }
@@ -604,6 +608,7 @@ object AppRepository {
             readSessionsOrderedByDateUtc().toDateInfos()
 
     private fun updateSessions(toBeUpdatedSessions: List<Session>, toBeDeletedSessions: List<Session> = emptyList()) {
+        logging.e(javaClass.simpleName, "updateSessions")
         val toBeUpdatedSessionsDatabaseModel = toBeUpdatedSessions.toSessionsDatabaseModel()
         val toBeUpdated = toBeUpdatedSessionsDatabaseModel.map { it.sessionId to it.toContentValues() }
         val toBeDeleted = toBeDeletedSessions.map { it.sessionId }
@@ -710,6 +715,7 @@ object AppRepository {
 
     @WorkerThread
     fun updateDisplayDayIndex(displayDayIndex: Int) {
+        logging.e(javaClass.simpleName, "updateDisplayDayIndex")
         sharedPreferencesRepository.setDisplayDayIndex(displayDayIndex)
         refreshUncanceledSessions()
     }
@@ -720,12 +726,14 @@ object AppRepository {
     @Deprecated("Users of AppRepository should not have to be responsible for triggering change notifications. " +
             "Replace with a mechanism internal to AppRepository.")
     fun notifyHighlightsChanged() {
+        logging.e(javaClass.simpleName, "notifyHighlightsChanged")
         refreshUncanceledSessions()
     }
 
     @Deprecated("Users of AppRepository should not have to be responsible for triggering change notifications. " +
             "Replace with a mechanism internal to AppRepository.")
     fun notifyAlarmsChanged() {
+        logging.e(javaClass.simpleName, "notifyAlarmsChanged")
         refreshUncanceledSessions()
     }
 
