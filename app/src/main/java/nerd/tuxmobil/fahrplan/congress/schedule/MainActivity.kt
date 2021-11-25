@@ -273,10 +273,8 @@ class MainActivity : BaseActivity(),
             MyApp.task_running = TASKS.FETCH
             showFetchingStatus()
             val url = appRepository.readScheduleUrl()
-            val okHttpClient = CustomHttpClient.createHttpClient()
             appRepository.loadSchedule(
                 url = url,
-                okHttpClient = okHttpClient,
                 onFetchingDone = ::onGotResponse,
                 onParsingDone = ::onParseDone,
                 onLoadingShiftsDone = ::onLoadShiftsDone
