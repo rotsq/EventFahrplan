@@ -17,6 +17,7 @@ import info.metadude.android.eventfahrplan.database.sqliteopenhelper.MetaDBOpenH
 import info.metadude.android.eventfahrplan.database.sqliteopenhelper.SessionsDBOpenHelper
 import info.metadude.android.eventfahrplan.engelsystem.EngelsystemNetworkRepository
 import info.metadude.android.eventfahrplan.engelsystem.models.ShiftsResult
+import info.metadude.android.eventfahrplan.network.downloading.ScheduleDownloader
 import info.metadude.android.eventfahrplan.network.models.Meta
 import info.metadude.android.eventfahrplan.network.repositories.ScheduleNetworkRepository
 import info.metadude.kotlin.library.engelsystem.models.Shift
@@ -173,7 +174,7 @@ object AppRepository {
             highlightsDatabaseRepository: HighlightsDatabaseRepository = HighlightsDatabaseRepository(HighlightDBOpenHelper(context)),
             sessionsDatabaseRepository: SessionsDatabaseRepository = SessionsDatabaseRepository(SessionsDBOpenHelper(context), logging),
             metaDatabaseRepository: MetaDatabaseRepository = MetaDatabaseRepository(MetaDBOpenHelper(context)),
-            scheduleNetworkRepository: ScheduleNetworkRepository = ScheduleNetworkRepository(),
+            scheduleNetworkRepository: ScheduleNetworkRepository = ScheduleNetworkRepository(ScheduleDownloader(okHttpClient)),
             engelsystemNetworkRepository: EngelsystemNetworkRepository = EngelsystemNetworkRepository(),
             sharedPreferencesRepository: SharedPreferencesRepository = SharedPreferencesRepository(context)
     ) {
@@ -210,9 +211,13 @@ object AppRepository {
         check(onFetchingDone != {}) { "Nobody registered to receive FetchScheduleResult." }
         // Fetching
         val meta = readMeta().toMetaNetworkModel()
-        scheduleNetworkRepository.fetchSchedule(okHttpClient, url, meta.eTag) { fetchScheduleResult ->
+        val requestIdentifier = "fetchSchedule"
+        parentJobs[requestIdentifier] = networkScope.launchNamed(requestIdentifier) {
+            val fetchScheduleResult = scheduleNetworkRepository.fetchSchedule(url, meta.eTag)
             val fetchResult = fetchScheduleResult.toAppFetchScheduleResult()
-            onFetchingDone.invoke(fetchResult)
+            networkScope.withUiContext {
+                onFetchingDone.invoke(fetchResult)
+            }
 
             if (fetchResult.isNotModified || fetchResult.isSuccessful) {
                 updateScheduleLastFetchedAt()
