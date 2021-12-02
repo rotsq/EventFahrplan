@@ -275,7 +275,11 @@ class MainActivity : BaseActivity(),
             val url = appRepository.readScheduleUrl()
             appRepository.loadSchedule(
                 url = url,
-                onFetchingDone = ::onGotResponse,
+                onFetchingDone = {
+                    runOnUiThread { // TODO Why does networkScope.withUiContext {  } not work?
+                        onGotResponse(it)
+                    }
+                },
                 onParsingDone = ::onParseDone,
                 onLoadingShiftsDone = ::onLoadShiftsDone
             )

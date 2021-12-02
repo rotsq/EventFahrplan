@@ -215,9 +215,7 @@ object AppRepository {
         parentJobs[requestIdentifier] = networkScope.launchNamed(requestIdentifier) {
             val fetchScheduleResult = scheduleNetworkRepository.fetchSchedule(url, meta.eTag)
             val fetchResult = fetchScheduleResult.toAppFetchScheduleResult()
-            networkScope.withUiContext {
-                onFetchingDone.invoke(fetchResult)
-            }
+            onFetchingDone.invoke(fetchResult) // TODO Why does networkScope.withUiContext {  } not work?
 
             if (fetchResult.isNotModified || fetchResult.isSuccessful) {
                 updateScheduleLastFetchedAt()
