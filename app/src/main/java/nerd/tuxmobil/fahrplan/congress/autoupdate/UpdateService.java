@@ -93,6 +93,7 @@ public class UpdateService extends SafeJobIntentService {
             MyApp.task_running = TASKS.FETCH;
             String url = appRepository.readScheduleUrl();
             appRepository.loadSchedule(url,
+                    false,
                     fetchScheduleResult -> {
                         onGotResponse(fetchScheduleResult);
                         return Unit.INSTANCE;

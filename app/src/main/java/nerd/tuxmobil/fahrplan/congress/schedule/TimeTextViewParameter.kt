@@ -1,6 +1,7 @@
 package nerd.tuxmobil.fahrplan.congress.schedule
 
 import androidx.annotation.LayoutRes
+import androidx.annotation.VisibleForTesting
 import info.metadude.android.eventfahrplan.commons.temporal.Moment
 import info.metadude.android.eventfahrplan.commons.temporal.Moment.Companion.MINUTES_OF_ONE_DAY
 import nerd.tuxmobil.fahrplan.congress.R
@@ -11,7 +12,7 @@ import nerd.tuxmobil.fahrplan.congress.schedule.FahrplanFragment.Companion.FIFTE
  * Parameters to be used to inflate and configure a time text view.
  */
 @Suppress("DataClassPrivateConstructor")
-internal data class TimeTextViewParameter private constructor(
+internal data class TimeTextViewParameter @VisibleForTesting constructor(
 
         @LayoutRes
         val layout: Int,

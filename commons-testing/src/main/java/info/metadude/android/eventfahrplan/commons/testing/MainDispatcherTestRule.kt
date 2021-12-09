@@ -1,5 +1,6 @@
 package info.metadude.android.eventfahrplan.commons.testing
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -16,7 +17,7 @@ import org.junit.runner.Description
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherTestRule(
 
-    private val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+    internal val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
 
 ) : TestWatcher(), TestCoroutineScope by TestCoroutineScope(dispatcher) {
 
@@ -32,3 +33,9 @@ class MainDispatcherTestRule(
     }
 
 }
+
+/**
+ * Creates a new [CoroutineScope] with the [MainDispatcherTestRule.dispatcher].
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+fun MainDispatcherTestRule.createCoroutineScope(): CoroutineScope = CoroutineScope(dispatcher)
